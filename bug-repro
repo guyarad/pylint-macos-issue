@@ -1,0 +1,54 @@
+#!/bin/bash
+
+set -eu
+
+function do_lint {
+  pylint --recursive=y --disable=W,C0114,C0115,C0116,R0903 -s=n .
+}
+
+echo
+echo "========================================================================="
+echo ">>> Running 'pylint' in a local folder"
+echo "    pylint is expected to fail..."
+
+cd /code || exit 1
+
+do_lint && echo "ERROR: Expected to fail" && exit 1 || echo "PYLINT FAILED"
+
+echo
+echo "========================================================================="
+echo ">>> Running 'pylint' in a mounted folder"
+echo "    for some reason, pylint succeeds when mounting a folder from MacOS host"
+
+cd /mounted_code || echo "Folder not mounted! use './run'" -a exit 1
+
+do_lint && echo "PYLINT SUCCEEDED" \
+  || echo "ERROR: expected pylint to succeed on the mounted folder (on MacOS host)"
+
+echo
+echo "========================================================================="
+echo ">>> RUNNING DIFF between folders"
+diff -r /code /mounted_code && echo "Folders are identical" \
+  || echo "ERROR: folders are supposed to be identical" -a exit 1
+
+echo
+echo "========================================================================="
+echo ">>> Oddly enough, adding '__init__.py' in the local folder solves it"
+cd /code
+touch "__init__.py"
+do_lint && echo "PYLINT SUCCEEDED" \
+  || echo "ERROR: This time, pylint was supposed to succeed, but failed" -a exit 1
+
+rm "__init__.py"
+
+echo
+echo "========================================================================="
+echo ">>> The following sed replacement also resolves the issue"
+sed -i 's/from module1 import Base/from module1.base import Base/' module1/derived.py \
+  || echo "ERROR: 'sed' failed..." -a exit 1
+
+do_lint && echo "PYLINT SUCCEEDED" || echo "ERROR: pylint was supposed to succeeded"
+
+echo
+echo "========================================================================="
+echo "TEST COMPLETED SUCCESSFULLY!"
