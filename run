@@ -1,4 +1,0 @@
-
-docker build -t pylint-bug .
-
-docker run -v "$(pwd)":/mounted_code pylint-bug

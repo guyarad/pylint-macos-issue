@@ -12,7 +12,6 @@ echo ">>> Running 'pylint' in a local folder"
 echo "    pylint is expected to fail..."
 
 cd /code || exit 1
-
 do_lint && echo "ERROR: Expected to fail" && exit 1 || echo "PYLINT FAILED"
 
 echo
@@ -33,22 +32,4 @@ diff -r /code /mounted_code && echo "Folders are identical" \
 
 echo
 echo "========================================================================="
-echo ">>> Oddly enough, adding '__init__.py' in the local folder solves it"
-cd /code
-touch "__init__.py"
-do_lint && echo "PYLINT SUCCEEDED" \
-  || echo "ERROR: This time, pylint was supposed to succeed, but failed" -a exit 1
-
-rm "__init__.py"
-
-echo
-echo "========================================================================="
-echo ">>> The following sed replacement also resolves the issue"
-sed -i 's/from module1 import Base/from module1.base import Base/' module1/derived.py \
-  || echo "ERROR: 'sed' failed..." -a exit 1
-
-do_lint && echo "PYLINT SUCCEEDED" || echo "ERROR: pylint was supposed to succeeded"
-
-echo
-echo "========================================================================="
-echo "TEST COMPLETED SUCCESSFULLY!"
+echo "BUG REPRODUCED SUCCESSFULLY!"

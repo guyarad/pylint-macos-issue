@@ -4,4 +4,6 @@ RUN pip install pylint
 
 COPY . /code
 
+WORKDIR /code
+
 CMD /code/bug-repro
