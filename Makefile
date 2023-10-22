@@ -11,3 +11,6 @@ verify_resolutions: build
 
 build:
 	docker build -t pylint-bug .
+
+test: build
+	docker run --rm pylint-bug python main.py

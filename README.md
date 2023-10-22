@@ -1,13 +1,15 @@
 # pylint-macos-issue
 
-This repository demonstrated what seems like at least one bug with `pylint` and MacOS.
+This repository demonstrated what seems like at least one bug with `pylint` and macOS.
 
 ## TL;DR
-No virtual environment neceesary. Simply use the provided `Makefile`.
+No virtual environment necessary. Simply use the provided `Makefile`.
 
     make bug_repro
 
     make verify_resolutions
+
+    make test
     
 ## Summary of the issues
 
@@ -22,7 +24,7 @@ Consider module `module1` that exposes both `Base` and `Derived` via its `__init
 
 Essentially, this might be considered a circular import, but the code works and is legal Python structure.
 
-What we found is that `pylint` works just fine running a MacOS, but fails inside a linux docker.
+What we found is that `pylint` works just fine running a macOS, but fails inside a linux docker.
 
 Testing the issue locally, I found that pylint has an inconsistent behavior running inside the docker.
 
@@ -37,11 +39,11 @@ Still, in the mounted folder it passes, but fails in the docker local folder.
 
 ### Resolutions
 
-Demostrated in
+Demonstrated in
 
     make verify_resolutions
 
-1. Avoid the aledged circular dependency by importing `Base` directly from it's contained file.
+1. Avoid the alleged circular dependency by importing `Base` directly from it's contained file.
 2. Add empty `__init__.py` to the repository root.
 
 Where resolution #1 indeed avoids the circular dependency, resolution #2 does not. 
@@ -55,5 +57,4 @@ So except for the inconsistency between the local and mounted folders, there's a
 ### What `verify-resolutions` does?
 1. Double-check `pylint` is still failing on the docker local folder.
 2. Issue resolution 1: shows that adding an empty `__init__.py` in the code root will make `pylint` succeeds on the local folder as well.
-5. Issue resolution 2: "fix" the cirular dependency to statisfy `pylint` on the local folder as well.
-
+3. Issue resolution 2: "fix" the circular dependency to statisfy `pylint` on the local folder as well.
