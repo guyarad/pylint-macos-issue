@@ -1,3 +1,4 @@
 
 class Base:
-    pass
+    def __init__(self):
+        print("hello from base")

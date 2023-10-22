@@ -6,29 +6,34 @@ function do_lint {
   pylint --recursive=y --disable=W,C0114,C0115,C0116,R0903 -s=n .
 }
 
+function error {
+  echo "ERROR:" "$*"
+  exit 1
+}
+
 echo
 echo "========================================================================="
 echo ">>> Running 'pylint' in a local folder"
 echo "    pylint is expected to fail..."
 
 cd /code || exit 1
-do_lint && echo "ERROR: Expected to fail" && exit 1 || echo "PYLINT FAILED"
+do_lint && error "ERROR: Expected to fail" || echo "PYLINT FAILED"
 
 echo
 echo "========================================================================="
 echo ">>> Running 'pylint' in a mounted folder"
 echo "    for some reason, pylint succeeds when mounting a folder from MacOS host"
 
-cd /mounted_code || echo "Folder not mounted! use './run'" -a exit 1
+cd /mounted_code || error "Folder not mounted! use './run'"
 
 do_lint && echo "PYLINT SUCCEEDED" \
-  || echo "ERROR: expected pylint to succeed on the mounted folder (on MacOS host)"
+  || error "ERROR: expected pylint to succeed on the mounted folder (on MacOS host)"
 
 echo
 echo "========================================================================="
 echo ">>> RUNNING DIFF between folders"
 diff -r /code /mounted_code && echo "Folders are identical" \
-  || echo "ERROR: folders are supposed to be identical" -a exit 1
+  || error "ERROR: folders are supposed to be identical"
 
 echo
 echo "========================================================================="

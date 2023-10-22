@@ -6,23 +6,28 @@ function do_lint {
   pylint --recursive=y --disable=W,C0114,C0115,C0116,R0903 -s=n .
 }
 
+function error {
+  echo "ERROR:" "$*"
+  exit 1
+}
+
 echo
 echo "========================================================================="
 echo ">>> Verifying 'pyling' is still failing..."
 cd /code || exit 1
-do_lint && echo "ERROR: Expected to fail" && exit 1 || echo "PYLINT FAILED"
+do_lint && error "ERROR: Expected to fail" || echo "PYLINT FAILED"
 
 echo
 echo "========================================================================="
 echo ">>> The following sed replacement resolves the issue"
 sed -i 's/from module1 import Base/from module1.base import Base/' module1/derived.py \
-  || echo "ERROR: 'sed' failed..." -a exit 1
+  || error "ERROR: 'sed' failed..."
 
-do_lint && echo "PYLINT SUCCEEDED" || echo "ERROR: pylint was supposed to succeeded"
+do_lint && echo "PYLINT SUCCEEDED" || error "ERROR: pylint was supposed to succeeded"
 
 # restore
 sed -i 's/from module1.base import Base/from module1 import Base/' module1/derived.py \
-  || echo "ERROR: 'sed' (restore) failed..." -a exit 1
+  || error "ERROR: 'sed' (restore) failed..."
 
 echo
 echo "========================================================================="
@@ -30,7 +35,7 @@ echo ">>> Oddly enough, adding '__init__.py' in the local folder also solves it"
 cd /code
 touch "__init__.py"
 do_lint && echo "PYLINT SUCCEEDED" \
-  || echo "ERROR: pylint was supposed to succeed" -a exit 1
+  || error "ERROR: pylint was supposed to succeed"
 
 rm "__init__.py"
 
